@@ -1,11 +1,11 @@
 # 10ex.dev Take Home Project
 
-**NOTE:** This is designed to be done with Elixir specifically, but if you have talked with 10ex.dev about using a different programming language that you are more comfortable, stick with that.
+> **Note**
+>This is designed to be done with Elixir specifically, but if you have talked with 10ex.dev about using a different programming language that you are more comfortable, stick with that.
 
 ## Getting started
 
-> We recommend to fork this repository to your GitHub account before you get started,
-> which makes it much easier to hand in the solution when you are done.
+> We recommend to fork this repository to your GitHub account before you get started, which makes it much easier to hand in the solution when you are done.
 
 ## Prerequisites
 
@@ -74,4 +74,25 @@ just as if you were working in a collaborative environment. We will review these
 changes as part of the pair review session. 
 
 
+## Goals
+  1. Fetch the characters from the Marvel API. Hint: You will use the URL
+  http://gateway.marvel.com/v1/public/characters?[authenticated_params]
 
+  2. Render the characters' names in a list on the UI with LiveView or via a controller and view.
+
+  3. This is slow, every time we load the page, we need to fetch all the data again from the Marvel
+  API. Let's implement a cache that stores this API call in memory so we don't need to keep
+  fetching it on each page reload.
+
+  4. Upper management really wants to know how often we are making requests to the Marvel API, so
+  let's capture the timestamp of each successful API call into a database table.
+
+  5. You will notice that the API is only giving us the first 20 results when we call it. Let's implement a
+  pagination system to allow the users to see additional results in the UI. How does this affect our cache? Should we change anything?
+
+  6. Let's add more test coverage. We want to mock the API calls, test the front end results, unit test
+  the api authentication code, etc.
+
+  7. What are some ways that we can improve the current code we just wrote?
+  - Cache improvements (invalidation, pre-fetching, data optimization, handling api call failures, etc).
+  - Improvements to the API interface.
