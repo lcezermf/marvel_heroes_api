@@ -2,10 +2,11 @@ import Config
 
 # Configure your database
 config :ten_ex_take_home, TenExTakeHome.Repo,
-  username: "postgres",
-  password: "postgres",
+  username: "user",
+  password: "password",
   hostname: "localhost",
-  database: "ten_ex_take_home_dev",
+  database: "ten_ex",
+  port: 5435,
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
   pool_size: 10
@@ -23,6 +24,7 @@ config :ten_ex_take_home, TenExTakeHomeWeb.Endpoint,
   check_origin: false,
   code_reloader: true,
   debug_errors: true,
+  server: true,
   secret_key_base: "DSPUh2SKNMG/pFs1ezaUygucy3c3x77sWytMXJ8BrYcXr1dJKa1BROrb43R7I/Bq",
   watchers: [
     esbuild: {Esbuild, :install_and_run, [:default, ~w(--sourcemap=inline --watch)]},
