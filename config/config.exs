@@ -59,9 +59,12 @@ config :logger, :console,
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 
+# Real http client that allow to call the external apis
+config :ten_ex_take_home, :http_client, HTTPoison
+
 config :ten_ex_take_home, :marvel_client,
   adapter: TenExTakeHomeWeb.Clients.MarvelClient,
-  base_uri: "http://gateway.marvel.com/v1/public/"
+  base_url: "https://gateway.marvel.com/v1/public"
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
