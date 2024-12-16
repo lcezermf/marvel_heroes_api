@@ -2,11 +2,10 @@ import Config
 
 # Configure your database
 config :ten_ex_take_home, TenExTakeHome.Repo,
-  username: "user",
-  password: "password",
-  hostname: "localhost",
+  username: System.get_env("POSTGRES_USER"),
+  password: System.get_env("POSTGRES_PASSWORD"),
+  hostname: System.get_env("POSTGRES_HOST"),
   database: "ten_ex",
-  port: 5435,
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
   pool_size: 10
@@ -79,3 +78,5 @@ config :phoenix, :plug_init_mode, :runtime
 
 # Disable swoosh api client as it is only required for production adapters.
 config :swoosh, :api_client, false
+
+import_config "dev.secret.exs"
