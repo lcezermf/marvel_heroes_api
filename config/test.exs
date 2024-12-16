@@ -31,3 +31,7 @@ config :logger, level: :warning
 
 # Initialize plugs at runtime for faster test compilation
 config :phoenix, :plug_init_mode, :runtime
+
+config :ten_ex_take_home, :marvel_client,
+  adapter: TenExTakeHome.Test.Support.Mocks.MarvelClientMock,
+  base_uri: "http://www.test.com/"

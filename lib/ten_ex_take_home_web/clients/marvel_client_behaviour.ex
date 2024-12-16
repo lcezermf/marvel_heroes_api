@@ -1,0 +1,8 @@
+defmodule TenExTakeHomeWeb.Clients.MarvelClientBehaviour do
+  @moduledoc """
+  Defines behaviour for Marvel API it allow us to later mock using Mox and
+  define better tests. More info: https://elixirschool.com/en/lessons/testing/mox
+  """
+
+  @callback get_characters() :: list()
+end
