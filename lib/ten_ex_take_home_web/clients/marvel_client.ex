@@ -9,7 +9,19 @@ defmodule TenExTakeHomeWeb.Clients.MarvelClient do
 
   @behaviour TenExTakeHomeWeb.Clients.MarvelClientBehaviour
 
+  @doc """
+  Fetches a list of Marvel characters from the Marvel API.
+
+  This function performs an HTTP GET request to the Marvel API `/characters` endpoint using the configured HTTP client.
+  It includes the required query parameters for authentication: `ts` (timestamp), `apikey` (public API key), and `hash` (MD5 hash of the timestamp, private key, and public key).
+
+  Returns:
+    - `{:ok, response}`: When the request is successful, where `response` is the decoded response body.
+    - `{:error, %{status_code: status_code, body: body}}`: When the request fails with a non-200 status code, where `status_code` and `body` describe the error.
+    - `{:error, error}`: When an HTTP error occurs, where `error` contains the error details.
+  """
   @impl true
+  @spec get_characters() :: {:error, any()} | {:ok, any()}
   def get_characters do
     Logger.info("Calling get_characters/0")
 
