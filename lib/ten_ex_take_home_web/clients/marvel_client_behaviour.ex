@@ -4,5 +4,5 @@ defmodule TenExTakeHomeWeb.Clients.MarvelClientBehaviour do
   define better tests. More info: https://elixirschool.com/en/lessons/testing/mox
   """
 
-  @callback get_characters() :: list()
+  @callback get_characters() :: {:ok, any()} | {:error, any()}
 end
