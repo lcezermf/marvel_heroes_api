@@ -4,6 +4,8 @@ defmodule TenExTakeHome.Heroes do
   """
 
   alias TenExTakeHome.Cache
+  alias TenExTakeHome.Heroes.APIRequest
+  alias TenExTakeHome.Repo
 
   @doc """
   Returns data for characters.
@@ -20,5 +22,14 @@ defmodule TenExTakeHome.Heroes do
       {:error, _error} -> []
       {:ok, characters} -> characters
     end
+  end
+
+  @doc """
+  Creates a new record for APIRequest
+  """
+  @spec create_api_request :: {:ok, Ecto.Changeset.t()} | {:error, Ecto.Changeset.t()}
+  def create_api_request do
+    APIRequest.changeset(%APIRequest{})
+    |> Repo.insert()
   end
 end

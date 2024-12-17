@@ -6,8 +6,7 @@ defmodule TenExTakeHome.Cache do
   require Logger
 
   @table :marvel_heroes
-  # Fix me
-  @expiry_in_minutes :timer.minutes(1)
+  @expiry_in :timer.minutes(10)
 
   def start_link(table_name \\ @table) do
     if :ets.info(table_name) == :undefined do
@@ -63,7 +62,7 @@ defmodule TenExTakeHome.Cache do
   defp get_characters_from_api(table) do
     case marvel_client().get_characters() do
       {:ok, characters} ->
-        expiry = System.system_time(:millisecond) + @expiry_in_minutes
+        expiry = System.system_time(:millisecond) + @expiry_in
 
         Logger.info("Inserting updated data from API into cache layer")
 

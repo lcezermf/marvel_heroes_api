@@ -7,6 +7,8 @@ defmodule TenExTakeHomeWeb.Clients.MarvelClient do
 
   require Logger
 
+  alias TenExTakeHome.Heroes
+
   @behaviour TenExTakeHomeWeb.Clients.MarvelClientBehaviour
 
   @doc """
@@ -41,6 +43,8 @@ defmodule TenExTakeHomeWeb.Clients.MarvelClient do
     case http_client().get("#{url}?#{query_string}") do
       {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
         Logger.info("Success getting data from API")
+
+        Heroes.create_api_request()
 
         {:ok, decoded_response(body)}
 

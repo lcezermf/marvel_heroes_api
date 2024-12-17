@@ -3,12 +3,16 @@ defmodule TenExTakeHomeWeb.Clients.MarvelClientTest do
 
   import Mox
 
+  alias TenExTakeHome.Heroes.APIRequest
+  alias TenExTakeHome.Repo
   alias TenExTakeHomeWeb.Clients.MarvelClient
 
   setup :verify_on_exit!
 
   describe "get_characters/0" do
     test "must return {:ok, results} where results is a list of data" do
+      assert Repo.aggregate(APIRequest, :count) == 0
+
       response_body = Jason.encode!(fake_raw_response())
 
       expect(http_client(), :get, fn _ ->
@@ -17,11 +21,15 @@ defmodule TenExTakeHomeWeb.Clients.MarvelClientTest do
 
       {:ok, [result | _] = results} = MarvelClient.get_characters()
 
+      assert Repo.aggregate(APIRequest, :count) == 1
+
       assert length(results) == 1
       assert result["name"] == "3-D Man"
     end
 
     test "must return {:error, map()} when request is wrong" do
+      assert Repo.aggregate(APIRequest, :count) == 0
+
       response_body =
         Jason.encode!(%{
           code: "MissingParameter",
@@ -31,6 +39,8 @@ defmodule TenExTakeHomeWeb.Clients.MarvelClientTest do
       expect(http_client(), :get, fn _ ->
         {:error, %HTTPoison.Response{body: response_body, status_code: 409}}
       end)
+
+      assert Repo.aggregate(APIRequest, :count) == 0
 
       {:error, response} = MarvelClient.get_characters()
 
