@@ -23,7 +23,7 @@ defmodule TenExTakeHomeWeb.Clients.MarvelClient do
   @impl true
   @spec get_characters() :: {:error, any()} | {:ok, any()}
   def get_characters do
-    Logger.info("Calling get_characters/0")
+    Logger.info("Calling get_characters/0 from MarvelClient")
 
     url = "#{base_url()}/characters"
 
@@ -40,12 +40,18 @@ defmodule TenExTakeHomeWeb.Clients.MarvelClient do
 
     case http_client().get("#{url}?#{query_string}") do
       {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
+        Logger.info("Success getting data from API")
+
         {:ok, decoded_response(body)}
 
       {:ok, %HTTPoison.Response{status_code: status_code, body: body}} ->
+        Logger.error("Error getting data from API. code: #{status_code}, body: #{inspect(body)}")
+
         {:error, %{status_code: status_code, body: body}}
 
       {:error, error} ->
+        Logger.error("Error getting data from API. error: #{inspect(error)}")
+
         {:error, error}
     end
   end

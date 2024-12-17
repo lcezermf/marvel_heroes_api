@@ -3,6 +3,8 @@ defmodule TenExTakeHome.Heroes do
   Context to hold business logic
   """
 
+  alias TenExTakeHome.Cache
+
   @doc """
   Returns data for characters.
 
@@ -14,11 +16,9 @@ defmodule TenExTakeHome.Heroes do
   """
   @spec get_characters :: list()
   def get_characters do
-    case marvel_client().get_characters() do
+    case Cache.get_characters() do
+      {:error, _error} -> []
       {:ok, characters} -> characters
-      {:error, _} -> []
     end
   end
-
-  defp marvel_client, do: Application.get_env(:ten_ex_take_home, :marvel_client)[:adapter]
 end

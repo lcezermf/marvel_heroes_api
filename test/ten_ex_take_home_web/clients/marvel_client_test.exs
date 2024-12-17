@@ -5,6 +5,8 @@ defmodule TenExTakeHomeWeb.Clients.MarvelClientTest do
 
   alias TenExTakeHomeWeb.Clients.MarvelClient
 
+  setup :verify_on_exit!
+
   describe "get_characters/0" do
     test "must return {:ok, results} where results is a list of data" do
       response_body = Jason.encode!(fake_raw_response())
