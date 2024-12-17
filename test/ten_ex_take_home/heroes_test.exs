@@ -37,5 +37,11 @@ defmodule TenExTakeHome.HeroesTest do
     end
   end
 
+  describe "create_api_request/0" do
+    test "must create a new record of api request" do
+      {:ok, %TenExTakeHome.Heroes.APIRequest{} = _api_request} = Heroes.create_api_request()
+    end
+  end
+
   defp marvel_client, do: Application.get_env(:ten_ex_take_home, :marvel_client)[:adapter]
 end

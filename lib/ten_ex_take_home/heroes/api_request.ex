@@ -1,5 +1,6 @@
 defmodule TenExTakeHome.Heroes.APIRequest do
   use Ecto.Schema
+
   import Ecto.Changeset
 
   schema "api_requests" do

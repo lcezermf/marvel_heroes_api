@@ -26,7 +26,6 @@ defmodule TenExTakeHome.Cache do
   - {:ok, data} - in case data is found in cache layer or it was a new retrive from API
   - :not_found - when no data is found
   """
-
   @spec get_characters :: {:ok, list()} | :not_found
   def get_characters(table \\ @table) do
     case get_characters_from_cache(table) do
