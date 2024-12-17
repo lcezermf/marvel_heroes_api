@@ -5,4 +5,5 @@ defmodule TenExTakeHomeWeb.Clients.MarvelClientBehaviour do
   """
 
   @callback get_characters() :: {:ok, any()} | {:error, any()}
+  @callback get_character(integer()) :: {:ok, any()} | {:error, any()}
 end
