@@ -10,7 +10,7 @@ defmodule TenExTakeHome.Heroes do
   @doc """
   Returns data for characters.
 
-  It fetches the data from API and return for the caller.
+  It fetches the data from cache or API and return for the caller.
 
     Returns:
     - list with data: When API returns data
@@ -21,6 +21,23 @@ defmodule TenExTakeHome.Heroes do
     case Cache.get_characters() do
       {:error, _error} -> []
       {:ok, characters} -> characters
+    end
+  end
+
+  @doc """
+  Returns data for a single character.
+
+  It fetches the data from cache or API and return for the caller.
+
+    Returns:
+    - a single record data
+    - nil in case of not found
+  """
+  @spec get_character(integer()) :: any()
+  def get_character(id) do
+    case Cache.get_character(id) do
+      {:error, _error} -> nil
+      {:ok, character} -> character
     end
   end
 

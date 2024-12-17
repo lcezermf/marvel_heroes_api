@@ -41,6 +41,20 @@ defmodule TenExTakeHome.Cache do
     end
   end
 
+  def get_character(table \\ @table, id) do
+    case get_characters_from_cache(table, id) do
+      {:ok, character} ->
+        Logger.info("Getting character #{id} data from cache layer")
+
+        {:ok, character}
+
+      {:not_found, _} ->
+        Logger.warn("No cache found from cache layer, getting data from API")
+
+        get_characters_from_api(table, id)
+    end
+  end
+
   defp get_characters_from_cache(table) do
     current_time = System.system_time(:millisecond)
 
@@ -58,6 +72,23 @@ defmodule TenExTakeHome.Cache do
     end
   end
 
+  defp get_characters_from_cache(table, id) do
+    current_time = System.system_time(:millisecond)
+
+    case :ets.lookup(table, id) do
+      [{id, character, expiry}] ->
+        if current_time < expiry do
+          {:ok, character}
+        else
+          :ets.delete(@table, id)
+          {:not_found, nil}
+        end
+
+      _ ->
+        {:not_found, nil}
+    end
+  end
+
   defp get_characters_from_api(table) do
     case marvel_client().get_characters() do
       {:ok, characters} ->
@@ -68,6 +99,24 @@ defmodule TenExTakeHome.Cache do
         :ets.insert(table, {:characters, characters, expiry})
 
         {:ok, characters}
+
+      {:error, error} ->
+        Logger.error("Error calling API")
+
+        {:error, error}
+    end
+  end
+
+  defp get_characters_from_api(table, id) do
+    case marvel_client().get_character(id) do
+      {:ok, character} ->
+        expiry = System.system_time(:millisecond) + @expiry_in
+
+        Logger.info("Inserting updated data from API into cache layer for a single id #{id}")
+
+        :ets.insert(table, {id, character, expiry})
+
+        {:ok, character}
 
       {:error, error} ->
         Logger.error("Error calling API")
