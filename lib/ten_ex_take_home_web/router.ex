@@ -20,6 +20,7 @@ defmodule TenExTakeHomeWeb.Router do
     get "/", PageController, :home
 
     live("/characters", CharactersLive.Index, :index)
+    live("/characters/:id", CharactersLive.Show, :show)
   end
 
   # Other scopes may use custom stacks.
