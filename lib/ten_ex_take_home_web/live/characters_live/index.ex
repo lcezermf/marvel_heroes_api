@@ -3,10 +3,12 @@ defmodule TenExTakeHomeWeb.CharactersLive.Index do
 
   require Logger
 
+  alias TenExTakeHome.Heroes
+
   def mount(_params, _session, socket) do
     characters =
       if connected?(socket) do
-        load_characters()
+        Heroes.get_characters()
       else
         []
       end
@@ -17,13 +19,4 @@ defmodule TenExTakeHomeWeb.CharactersLive.Index do
 
     {:ok, socket}
   end
-
-  defp load_characters do
-    case marvel_client().get_characters() do
-      {:ok, characters} -> characters
-      {:error, _} -> []
-    end
-  end
-
-  defp marvel_client, do: Application.get_env(:ten_ex_take_home, :marvel_client)[:adapter]
 end
