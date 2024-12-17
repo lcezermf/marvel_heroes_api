@@ -13,6 +13,57 @@
     <p class="text-gray-700 mt-2">
       <%= truncate(@character["description"]) %>
     </p>
+    <div class="tabs mt-6">
+      <div class="flex border-b">
+        <button
+          phx-click="select_tab"
+          phx-value-tab="comics"
+          id={"comics-tab-character-#{@character["id"]}"}
+          class={"px-4 py-2 cursor-pointer " <> active_class(@active_tab, "comics")}
+        >
+          Comics
+          <span class="rounded-sm bg-blue-400 text-white p-1">
+            <%= @character["comics"]["available"] %>
+          </span>
+        </button>
+        <button
+          phx-click="select_tab"
+          phx-value-tab="events"
+          id={"events-tab-character-#{@character["id"]}"}
+          class={"px-4 py-2 cursor-pointer " <> active_class(@active_tab, "events")}
+        >
+          Events
+          <span class="rounded-sm bg-blue-400 text-white p-1">
+            <%= @character["events"]["available"] %>
+          </span>
+        </button>
+      </div>
+
+      <%!-- <div class="tab-content mt-4">
+        <%= if @active_tab == "events" do %>
+          <div class="grid grid-cols-2 gap-4">
+            <%= for event <- @character["events"] do %>
+              <img
+                src={"#{event["thumbnail"]["path"]}/standard_fantastic.#{event["thumbnail"]["extension"]}"}
+                alt={event["title"]}
+                class="object-cover w-full h-32 rounded"
+              />
+            <% end %>
+          </div>
+        <% else %>
+          <div class="grid grid-cols-2 gap-4">
+            <%= for comic <- @character["comics"] do %>
+              <img
+                src={"#{comic["thumbnail"]["path"]}/standard_fantastic.#{comic["thumbnail"]["extension"]}"}
+                alt={comic["title"]}
+                class="object-cover w-full h-32 rounded"
+              />
+            <% end %>
+          </div>
+        <% end %>
+      </div> --%>
+    </div>
+
     <.link navigate={~p"/characters"} class="text-blue-500 hover:underline mt-4 inline-block">
       Back to Characters
     </.link>

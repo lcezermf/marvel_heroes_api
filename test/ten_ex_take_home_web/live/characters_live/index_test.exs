@@ -4,23 +4,30 @@ defmodule TenExTakeHomeWeb.CharactersLive.IndexTest do
   import Mox
   import Phoenix.LiveViewTest
 
-  describe "loads the page" do
-    test "must render page with data loaded", %{conn: conn} do
-      expect(marvel_client(), :get_characters, fn ->
-        {:ok, [%{"id" => 1, "name" => "3-D Man"}]}
-      end)
+  test "must render page with data loaded", %{conn: conn} do
+    expect(marvel_client(), :get_characters, fn ->
+      {:ok, [%{"id" => 1, "name" => "3-D Man"}]}
+    end)
 
-      {:ok, view, html} = access_characters_page(conn)
+    {:ok, view, html} = access_characters_page(conn)
 
-      assert html =~ "Welcome to heroes page!"
+    assert html =~ "Welcome to heroes page!"
 
-      assert has_element?(view, "#character-#{1}")
-    end
+    assert has_element?(view, "#character-#{1}")
   end
 
   test "must navigate to the details page when clicking a character link", %{conn: conn} do
     expect(marvel_client(), :get_characters, fn ->
-      {:ok, [%{"id" => 1, "name" => "3-D Man"}]}
+      {:ok,
+       [
+         %{
+           "id" => 1,
+           "name" => "3-D Man",
+           "description" => "OK",
+           "comics" => %{"available" => 1},
+           "events" => %{"available" => 2}
+         }
+       ]}
     end)
 
     {:ok, view, html} = access_characters_page(conn)

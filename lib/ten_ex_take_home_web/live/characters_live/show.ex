@@ -9,6 +9,17 @@ defmodule TenExTakeHomeWeb.CharactersLive.Show do
 
   alias TenExTakeHome.Heroes
 
+  @impl true
+  def mount(_params, _session, socket) do
+    socket =
+      socket
+      |> assign(:character, nil)
+      |> assign(:active_tab, "events")
+
+    {:ok, assign(socket, character: nil, active_tab: "comics")}
+  end
+
+  @impl true
   def handle_params(%{"id" => id}, _uri, socket) do
     character =
       id
@@ -22,6 +33,15 @@ defmodule TenExTakeHomeWeb.CharactersLive.Show do
     {:noreply, socket}
   end
 
+  @impl true
+  def handle_event("select_tab", %{"tab" => tab}, socket) do
+    socket =
+      socket
+      |> assign(:active_tab, tab)
+
+    {:noreply, socket}
+  end
+
   def truncate(_string, length \\ 100)
 
   def truncate("", _length), do: ""
@@ -31,5 +51,13 @@ defmodule TenExTakeHomeWeb.CharactersLive.Show do
     |> String.slice(0, length)
     |> String.trim_trailing()
     |> Kernel.<>("...")
+  end
+
+  def active_class(active_tab, tab) do
+    if active_tab == tab do
+      "border-b-2 border-blue-500 font-bold"
+    else
+      "text-gray-500"
+    end
   end
 end
