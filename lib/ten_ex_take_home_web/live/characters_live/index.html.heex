@@ -5,15 +5,17 @@
       class="relative group rounded overflow-hidden shadow-lg"
       id={"character-#{character["id"]}"}
     >
-      <img
-        src={"#{character["thumbnail"]["path"]}/standard_fantastic.#{character["thumbnail"]["extension"]}"}
-        alt={character["name"]}
-        class="object-cover w-full h-48"
-      />
+      <.link navigate={~p"/characters/#{character["id"]}"}>
+        <img
+          src={"#{character["thumbnail"]["path"]}/standard_fantastic.#{character["thumbnail"]["extension"]}"}
+          alt={character["name"]}
+          class="object-cover w-full h-48"
+        />
 
-      <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent text-white p-2 text-sm font-medium text-center group-hover:opacity-100 opacity-90">
-        <%= character["name"] %>
-      </div>
+        <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent text-white p-2 text-sm font-medium text-center group-hover:opacity-100 opacity-90">
+          <%= character["name"] %>
+        </div>
+      </.link>
     </div>
   <% end %>
 </div>

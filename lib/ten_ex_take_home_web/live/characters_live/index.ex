@@ -1,4 +1,8 @@
 defmodule TenExTakeHomeWeb.CharactersLive.Index do
+  @moduledoc """
+  LiveView module to manage the list of heroes
+  """
+
   use TenExTakeHomeWeb, :live_view
 
   require Logger
