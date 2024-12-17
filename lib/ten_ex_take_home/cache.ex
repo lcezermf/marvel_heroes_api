@@ -41,6 +41,16 @@ defmodule TenExTakeHome.Cache do
     end
   end
 
+  @doc """
+  Get single character from a cache layer.
+
+  Instead of calling API every time to get that, the API call is hidden into this module so
+  if the cache exists and not expired it returns data, otherwise will retrieve data from API.
+
+  Returns:
+  - {:ok, data} - in case data is found in cache layer or it was a new retrive from API
+  - :not_found - when no data is found
+  """
   def get_character(table \\ @table, id) do
     case get_characters_from_cache(table, id) do
       {:ok, character} ->
