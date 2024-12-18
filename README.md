@@ -2,7 +2,7 @@
 
 App with interaction with Marvel API.
 
-App is deployed and running on Gigalixir ?
+App is deployed and running on Gigalixir https://marvelheroes.gigalixirapp.com/characters/
 
 ### Stack
 
@@ -13,6 +13,12 @@ The solution was built using:
 - Phoenix 1.7.10
 - LiveView 0.19
 - PostgreSQL
+
+### Cache 
+
+There is a cache in the APP set to expiry every 1 hour. This cache handles results for list of characters, a single character, list of comics and events.
+
+The first request may take longer but the next ones for the same resources will be fast due to caching.
 
 ### Installation & Setup
 
