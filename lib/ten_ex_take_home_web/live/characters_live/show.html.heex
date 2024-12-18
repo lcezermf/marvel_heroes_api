@@ -1,5 +1,11 @@
 <%= if is_nil(@character) do %>
-  Not found!
+  <div class="min-h-screen flex flex-col justify-center items-center bg-gray-100">
+    <h1 class="text-6xl font-bold text-gray-800 mb-4">404</h1>
+    <p class="text-lg text-gray-600 mb-6">Oops! The page you're looking for doesn't exist.</p>
+    <.link navigate={~p"/characters"} class="text-blue-500 hover:underline mt-4 inline-block mb-4">
+      Back to Characters
+    </.link>
+  </div>
 <% else %>
   <.link navigate={~p"/characters"} class="text-blue-500 hover:underline mt-4 inline-block mb-4">
     Back to Characters
