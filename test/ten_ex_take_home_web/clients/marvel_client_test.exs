@@ -22,6 +22,7 @@ defmodule TenExTakeHomeWeb.Clients.MarvelClientTest do
       {:ok, [result | _] = results} = MarvelClient.get_characters()
 
       assert Repo.aggregate(APIRequest, :count) == 1
+      assert Repo.one(APIRequest, limit: 1).url =~ "/characters"
 
       assert length(results) == 1
       assert result["name"] == "3-D Man"
@@ -63,6 +64,7 @@ defmodule TenExTakeHomeWeb.Clients.MarvelClientTest do
       {:ok, result} = MarvelClient.get_character(1_009_144)
 
       assert Repo.aggregate(APIRequest, :count) == 1
+      assert Repo.one(APIRequest, limit: 1).url =~ "/characters/#{result["id"]}"
       assert result["name"] == "A.I.M."
     end
 

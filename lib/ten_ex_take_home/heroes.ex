@@ -44,9 +44,10 @@ defmodule TenExTakeHome.Heroes do
   @doc """
   Creates a new record for APIRequest
   """
-  @spec create_api_request :: {:ok, Ecto.Changeset.t()} | {:error, Ecto.Changeset.t()}
-  def create_api_request do
-    APIRequest.changeset(%APIRequest{})
+  @spec create_api_request(map()) :: {:ok, Ecto.Changeset.t()} | {:error, Ecto.Changeset.t()}
+  def create_api_request(params) do
+    %APIRequest{}
+    |> APIRequest.changeset(params)
     |> Repo.insert()
   end
 end

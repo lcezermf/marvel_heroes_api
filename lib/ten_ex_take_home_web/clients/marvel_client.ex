@@ -44,7 +44,7 @@ defmodule TenExTakeHomeWeb.Clients.MarvelClient do
       {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
         Logger.info("Success getting data from API")
 
-        Heroes.create_api_request()
+        Heroes.create_api_request(%{url: url})
 
         {:ok, decoded_response(body)}
 
@@ -93,7 +93,7 @@ defmodule TenExTakeHomeWeb.Clients.MarvelClient do
       {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
         Logger.info("Success getting data from API")
 
-        Heroes.create_api_request()
+        Heroes.create_api_request(%{url: url})
 
         {:ok, List.first(decoded_response(body))}
 

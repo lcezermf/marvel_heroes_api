@@ -67,9 +67,12 @@ defmodule TenExTakeHome.HeroesTest do
     end
   end
 
-  describe "create_api_request/0" do
+  describe "create_api_request/1" do
     test "must create a new record of api request" do
-      {:ok, %TenExTakeHome.Heroes.APIRequest{} = _api_request} = Heroes.create_api_request()
+      {:ok, %TenExTakeHome.Heroes.APIRequest{} = api_request} =
+        Heroes.create_api_request(%{url: "ok"})
+
+      assert api_request.url == "ok"
     end
   end
 

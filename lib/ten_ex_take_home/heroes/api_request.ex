@@ -4,12 +4,14 @@ defmodule TenExTakeHome.Heroes.APIRequest do
   import Ecto.Changeset
 
   schema "api_requests" do
+    field :url, :string, default: ""
+
     timestamps()
   end
 
   @doc false
-  def changeset(api_request) do
+  def changeset(api_request, attrs) do
     api_request
-    |> cast(%{}, [])
+    |> cast(attrs, [:url])
   end
 end
