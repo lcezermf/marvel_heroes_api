@@ -63,6 +63,10 @@ if config_env() == :prod do
     ],
     secret_key_base: secret_key_base
 
+  config :ten_ex_take_home, :marvel_client,
+    public_key: System.get_env("MARVEL_API_PUBLIC_KEY"),
+    private_key: System.get_env("MARVEL_API_PRIVATE_KEY")
+
   # ## SSL Support
   #
   # To get SSL working, you will need to add the `https` key
