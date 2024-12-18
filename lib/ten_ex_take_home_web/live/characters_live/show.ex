@@ -14,6 +14,8 @@ defmodule TenExTakeHomeWeb.CharactersLive.Show do
     socket =
       socket
       |> assign(:character, nil)
+      |> assign(:comics, [])
+      |> assign(:events, [])
       |> assign(:active_tab, "events")
 
     {:ok, assign(socket, character: nil, active_tab: "comics")}
@@ -26,9 +28,15 @@ defmodule TenExTakeHomeWeb.CharactersLive.Show do
       |> String.to_integer()
       |> Heroes.get_character()
 
+    comics =
+      id
+      |> String.to_integer()
+      |> Heroes.get_comics()
+
     socket =
       socket
       |> assign(:character, character)
+      |> assign(:comics, comics)
 
     {:noreply, socket}
   end

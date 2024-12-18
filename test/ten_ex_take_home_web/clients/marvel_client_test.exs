@@ -91,6 +91,46 @@ defmodule TenExTakeHomeWeb.Clients.MarvelClientTest do
     end
   end
 
+  describe "get_comics/1" do
+    test "must return {:ok, results} where results is a list of data" do
+      assert Repo.aggregate(APIRequest, :count) == 0
+
+      response_body = Jason.encode!(fake_raw_response_with_comics())
+
+      expect(http_client(), :get, fn _ ->
+        {:ok, %HTTPoison.Response{body: response_body, status_code: 200}}
+      end)
+
+      {:ok, [result | _]} = MarvelClient.get_comics(1_009_144)
+
+      assert Repo.aggregate(APIRequest, :count) == 1
+      assert Repo.one(APIRequest, limit: 1).url =~ "/characters/#{1_009_144}/comics"
+      assert result["title"] == "MARVEL SUPER HEROES SECRET WARS #6 FACSIMILE EDITION (2024) #6"
+    end
+
+    test "must return {:error, map()} when request is wrong" do
+      assert Repo.aggregate(APIRequest, :count) == 0
+
+      response_body =
+        Jason.encode!(%{
+          code: "MissingParameter",
+          message: "You must provide a timestamp."
+        })
+
+      expect(http_client(), :get, fn _ ->
+        {:error, %HTTPoison.Response{body: response_body, status_code: 409}}
+      end)
+
+      assert Repo.aggregate(APIRequest, :count) == 0
+
+      {:error, response} = MarvelClient.get_characters()
+
+      assert response.status_code == 409
+      assert Jason.decode!(response.body)["code"] == "MissingParameter"
+      assert Jason.decode!(response.body)["message"] == "You must provide a timestamp."
+    end
+  end
+
   defp http_client, do: Application.get_env(:ten_ex_take_home, :http_client)
 
   defp fake_raw_response_with_list_of_characters do
@@ -525,6 +565,220 @@ defmodule TenExTakeHomeWeb.Clients.MarvelClientTest do
                   "http://marvel.com/comics/characters/1009144/aim.?utm_campaign=apiRef&utm_source=91f5d1d5b0209ba9bba6086f01263b39"
               }
             ]
+          }
+        ]
+      }
+    }
+  end
+
+  defp fake_raw_response_with_comics do
+    %{
+      "code" => 200,
+      "status" => "Ok",
+      "copyright" => "© 2024 MARVEL",
+      "attributionText" => "Data provided by Marvel. © 2024 MARVEL",
+      "attributionHTML" =>
+        "<a href=\"http://marvel.com\">Data provided by Marvel. © 2024 MARVEL</a>",
+      "etag" => "524b02e2a3ebd84d939d509dfd706376f0e1a241",
+      "data" => %{
+        "offset" => 0,
+        "limit" => 1,
+        "total" => 104,
+        "count" => 1,
+        "results" => [
+          %{
+            "id" => 112_787,
+            "digitalId" => 66620,
+            "title" => "MARVEL SUPER HEROES SECRET WARS #6 FACSIMILE EDITION (2024) #6",
+            "issueNumber" => 6,
+            "variantDescription" => "",
+            "description" =>
+              "Marvel's monthly celebration of the finest super-hero crossover of them all reaches the halfway point! The Wasp has escaped from the clutches of Magneto - but in the dangerous terrain of Battleworld, she may be out of the frying pan but is still very much in the fire! Will Janet Van Dyne face the fury of the Lizard? Meanwhile, Doctor Doom has infiltrated the worldship of Galactus - and is surprised to be met by a reconstituted Klaw, master of sound! And Charles Xavier uses his mental powers to discern the villains' plans - but as the X-Men head off for battle, his actions lead to dissension in the ranks! It's one of the all-time great Marvel comic books, boldly re-presented in its original form, ads and all! Reprinting MARVEL SUPER HEROES SECRET WARS #6.",
+            "modified" => "2024-05-21T16:52:17-0400",
+            "isbn" => "",
+            "upc" => "75960620816600611",
+            "diamondCode" => "",
+            "ean" => "",
+            "issn" => "",
+            "format" => "Comic",
+            "pageCount" => 32,
+            "textObjects" => [],
+            "resourceURI" => "http://gateway.marvel.com/v1/public/comics/112787",
+            "urls" => [
+              %{
+                "type" => "detail",
+                "url" =>
+                  "http://marvel.com/comics/issue/112787/marvel_super_heroes_secret_wars_6_facsimile_edition_2024_6?utm_campaign=apiRef&utm_source=91f5d1d5b0209ba9bba6086f01263b39"
+              },
+              %{
+                "type" => "reader",
+                "url" =>
+                  "http://marvel.com/digitalcomics/view.htm?iid=66620&utm_campaign=apiRef&utm_source=91f5d1d5b0209ba9bba6086f01263b39"
+              }
+            ],
+            "series" => %{
+              "resourceURI" => "http://gateway.marvel.com/v1/public/series/38779",
+              "name" => "MARVEL SUPER HEROES SECRET WARS #6 FACSIMILE EDITION (2024 - Present)"
+            },
+            "variants" => [],
+            "collections" => [],
+            "collectedIssues" => [],
+            "dates" => [
+              %{
+                "type" => "onsaleDate",
+                "date" => "2024-06-05T00:00:00-0400"
+              },
+              %{
+                "type" => "focDate",
+                "date" => "2024-04-22T00:00:00-0400"
+              },
+              %{
+                "type" => "unlimitedDate",
+                "date" => "2024-09-09T00:00:00-0400"
+              }
+            ],
+            "prices" => [
+              %{
+                "type" => "printPrice",
+                "price" => 4.99
+              }
+            ],
+            "thumbnail" => %{
+              "path" => "http://i.annihil.us/u/prod/marvel/i/mg/6/40/66634dbeb3253",
+              "extension" => "jpg"
+            },
+            "images" => [
+              %{
+                "path" => "http://i.annihil.us/u/prod/marvel/i/mg/6/40/66634dbeb3253",
+                "extension" => "jpg"
+              }
+            ],
+            "creators" => %{
+              "available" => 7,
+              "collectionURI" => "http://gateway.marvel.com/v1/public/comics/112787/creators",
+              "items" => [
+                %{
+                  "resourceURI" => "http://gateway.marvel.com/v1/public/creators/2038",
+                  "name" => "John Beatty",
+                  "role" => "inker"
+                },
+                %{
+                  "resourceURI" => "http://gateway.marvel.com/v1/public/creators/586",
+                  "name" => "Michael Kelleher",
+                  "role" => "colorist"
+                },
+                %{
+                  "resourceURI" => "http://gateway.marvel.com/v1/public/creators/6758",
+                  "name" => "Christie Scheele",
+                  "role" => "colorist"
+                },
+                %{
+                  "resourceURI" => "http://gateway.marvel.com/v1/public/creators/1759",
+                  "name" => "Joe Rosen",
+                  "role" => "letterer"
+                },
+                %{
+                  "resourceURI" => "http://gateway.marvel.com/v1/public/creators/946",
+                  "name" => "Jim Shooter",
+                  "role" => "writer"
+                },
+                %{
+                  "resourceURI" => "http://gateway.marvel.com/v1/public/creators/4430",
+                  "name" => "Jeff Youngquist",
+                  "role" => "editor"
+                },
+                %{
+                  "resourceURI" => "http://gateway.marvel.com/v1/public/creators/13352",
+                  "name" => "Mike Zeck",
+                  "role" => "penciler"
+                }
+              ],
+              "returned" => 7
+            },
+            "characters" => %{
+              "available" => 13,
+              "collectionURI" => "http://gateway.marvel.com/v1/public/comics/112787/characters",
+              "items" => [
+                %{
+                  "resourceURI" => "http://gateway.marvel.com/v1/public/characters/1009148",
+                  "name" => "Absorbing Man"
+                },
+                %{
+                  "resourceURI" => "http://gateway.marvel.com/v1/public/characters/1009165",
+                  "name" => "Avengers"
+                },
+                %{
+                  "resourceURI" => "http://gateway.marvel.com/v1/public/characters/1009733",
+                  "name" => "Charles Xavier"
+                },
+                %{
+                  "resourceURI" => "http://gateway.marvel.com/v1/public/characters/1009281",
+                  "name" => "Doctor Doom"
+                },
+                %{
+                  "resourceURI" => "http://gateway.marvel.com/v1/public/characters/1009276",
+                  "name" => "Doctor Octopus"
+                },
+                %{
+                  "resourceURI" => "http://gateway.marvel.com/v1/public/characters/1009312",
+                  "name" => "Galactus"
+                },
+                %{
+                  "resourceURI" => "http://gateway.marvel.com/v1/public/characters/1009390",
+                  "name" => "Klaw"
+                },
+                %{
+                  "resourceURI" => "http://gateway.marvel.com/v1/public/characters/1009404",
+                  "name" => "Lizard"
+                },
+                %{
+                  "resourceURI" => "http://gateway.marvel.com/v1/public/characters/1009417",
+                  "name" => "Magneto"
+                },
+                %{
+                  "resourceURI" => "http://gateway.marvel.com/v1/public/characters/1010669",
+                  "name" => "Titania"
+                },
+                %{
+                  "resourceURI" => "http://gateway.marvel.com/v1/public/characters/1009685",
+                  "name" => "Ultron"
+                },
+                %{
+                  "resourceURI" => "http://gateway.marvel.com/v1/public/characters/1009707",
+                  "name" => "Wasp"
+                },
+                %{
+                  "resourceURI" => "http://gateway.marvel.com/v1/public/characters/1010883",
+                  "name" => "Wrecking Crew"
+                }
+              ],
+              "returned" => 13
+            },
+            "stories" => %{
+              "available" => 2,
+              "collectionURI" => "http://gateway.marvel.com/v1/public/comics/112787/stories",
+              "items" => [
+                %{
+                  "resourceURI" => "http://gateway.marvel.com/v1/public/stories/246768",
+                  "name" =>
+                    "cover from Marvel Super Heroes Secret Wars 6 Facsimile Edition (2024) #6",
+                  "type" => "cover"
+                },
+                %{
+                  "resourceURI" => "http://gateway.marvel.com/v1/public/stories/246769",
+                  "name" =>
+                    "story from Marvel Super Heroes Secret Wars 6 Facsimile Edition (2024) #6",
+                  "type" => "interiorStory"
+                }
+              ],
+              "returned" => 2
+            },
+            "events" => %{
+              "available" => 0,
+              "collectionURI" => "http://gateway.marvel.com/v1/public/comics/112787/events",
+              "items" => [],
+              "returned" => 0
+            }
           }
         ]
       }

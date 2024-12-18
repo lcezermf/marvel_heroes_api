@@ -18,6 +18,20 @@ defmodule TenExTakeHomeWeb.CharactersLive.ShowTest do
        }}
     end)
 
+    expect(marvel_client(), :get_comics, fn _ ->
+      {:ok,
+       [
+         %{
+           "id" => 1,
+           "title" => "Title",
+           "thumbnail" => %{
+             "path" => "http://i.annihil.us/u/prod/marvel/i/mg/9/e0/65cccf7d07908",
+             "extension" => "jpg"
+           }
+         }
+       ]}
+    end)
+
     {:ok, view, html} = access_characters_page(conn, 1)
 
     assert html =~ "Name"
@@ -36,6 +50,20 @@ defmodule TenExTakeHomeWeb.CharactersLive.ShowTest do
          "comics" => %{"available" => 10},
          "events" => %{"available" => 10}
        }}
+    end)
+
+    expect(marvel_client(), :get_comics, fn _ ->
+      {:ok,
+       [
+         %{
+           "id" => 1,
+           "title" => "Title",
+           "thumbnail" => %{
+             "path" => "http://i.annihil.us/u/prod/marvel/i/mg/9/e0/65cccf7d07908",
+             "extension" => "jpg"
+           }
+         }
+       ]}
     end)
 
     {:ok, view, html} = access_characters_page(conn, 1)

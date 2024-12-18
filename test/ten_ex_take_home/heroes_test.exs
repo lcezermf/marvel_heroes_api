@@ -7,7 +7,7 @@ defmodule TenExTakeHome.HeroesTest do
 
   setup :verify_on_exit!
 
-  describe "get_characters" do
+  describe "get_characters/0" do
     test "must return a list of data" do
       expiry = System.system_time(:millisecond) + :timer.minutes(1)
 
@@ -64,6 +64,35 @@ defmodule TenExTakeHome.HeroesTest do
       result = Heroes.get_character(1)
 
       assert is_nil(result)
+    end
+  end
+
+  describe "get_comics/1" do
+    test "must return a list of data" do
+      expiry = System.system_time(:millisecond) + :timer.minutes(1)
+
+      :ets.insert(
+        :marvel_heroes,
+        {{1, :comics}, [%{"title" => "Title"}], expiry}
+      )
+
+      [result | _] = results = Heroes.get_comics(1)
+
+      refute Enum.empty?(results)
+      assert result["title"] == "Title"
+    end
+
+    test "must return empty list when no data to fetch" do
+      :ets.delete(:marvel_heroes, {1, :comics})
+
+      # when cache does not exists it tries to get data from API
+      expect(marvel_client(), :get_comics, fn _ ->
+        {:error, "error"}
+      end)
+
+      results = Heroes.get_comics(1)
+
+      assert Enum.empty?(results)
     end
   end
 

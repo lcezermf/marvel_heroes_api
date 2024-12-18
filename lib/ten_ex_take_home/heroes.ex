@@ -42,6 +42,23 @@ defmodule TenExTakeHome.Heroes do
   end
 
   @doc """
+  Returns data for a character comics.
+
+  It fetches the data from cache or API and return for the caller.
+
+    Returns:
+    - list with data: When API returns data
+    - empty list when no data from API
+  """
+  @spec get_comics(integer()) :: list()
+  def get_comics(id) do
+    case Cache.get_comics(id) do
+      {:error, _error} -> []
+      {:ok, comics} -> comics
+    end
+  end
+
+  @doc """
   Creates a new record for APIRequest
   """
   @spec create_api_request(map()) :: {:ok, Ecto.Changeset.t()} | {:error, Ecto.Changeset.t()}

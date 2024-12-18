@@ -87,7 +87,7 @@ defmodule TenExTakeHome.Cache do
   - :not_found - when no data is found
   """
   def get_character(table \\ @table, id) do
-    case get_characters_from_cache(table, id) do
+    case get_character_from_cache(table, id) do
       {:ok, character} ->
         Logger.info("Getting character #{id} data from cache layer")
 
@@ -96,11 +96,11 @@ defmodule TenExTakeHome.Cache do
       {:not_found, _} ->
         Logger.warn("No cache found from cache layer, getting data from API")
 
-        get_characters_from_api(table, id)
+        get_character_from_api(table, id)
     end
   end
 
-  defp get_characters_from_cache(table, id) do
+  defp get_character_from_cache(table, id) do
     current_time = System.system_time(:millisecond)
 
     case :ets.lookup(table, id) do
@@ -117,7 +117,7 @@ defmodule TenExTakeHome.Cache do
     end
   end
 
-  defp get_characters_from_api(table, id) do
+  defp get_character_from_api(table, id) do
     case marvel_client().get_character(id) do
       {:ok, character} ->
         expiry = System.system_time(:millisecond) + @expiry_in
@@ -127,6 +127,67 @@ defmodule TenExTakeHome.Cache do
         :ets.insert(table, {id, character, expiry})
 
         {:ok, character}
+
+      {:error, error} ->
+        Logger.error("Error calling API")
+
+        {:error, error}
+    end
+  end
+
+  ##
+
+  @doc """
+  Get comics from character from a cache layer.
+
+  Instead of calling API every time to get that, the API call is hidden into this module so
+  if the cache exists and not expired it returns data, otherwise will retrieve data from API.
+
+  Returns:
+  - {:ok, data} - in case data is found in cache layer or it was a new retrive from API
+  - :not_found - when no data is found
+  """
+  def get_comics(table \\ @table, id) do
+    case get_comics_from_cache(table, id) do
+      {:ok, comics} ->
+        Logger.info("Getting comics for character #{id} data from cache layer")
+
+        {:ok, comics}
+
+      {:not_found, _} ->
+        Logger.warn("No cache found from cache layer, getting data from API")
+
+        get_comics_from_api(table, id)
+    end
+  end
+
+  defp get_comics_from_cache(table, id) do
+    current_time = System.system_time(:millisecond)
+
+    case :ets.lookup(table, {id, :comics}) do
+      [{{id, :comics}, comics, expiry}] ->
+        if current_time < expiry do
+          {:ok, comics}
+        else
+          :ets.delete(@table, {id, :comics})
+          {:not_found, nil}
+        end
+
+      _ ->
+        {:not_found, nil}
+    end
+  end
+
+  defp get_comics_from_api(table, id) do
+    case marvel_client().get_comics(id) do
+      {:ok, comics} ->
+        expiry = System.system_time(:millisecond) + @expiry_in
+
+        Logger.info("Inserting updated data from API into cache layer for a comics for id #{id}")
+
+        :ets.insert(table, {{id, :comics}, comics, expiry})
+
+        {:ok, comics}
 
       {:error, error} ->
         Logger.error("Error calling API")
