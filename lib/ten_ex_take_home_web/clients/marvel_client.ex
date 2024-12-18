@@ -29,16 +29,7 @@ defmodule TenExTakeHomeWeb.Clients.MarvelClient do
 
     url = "#{base_url()}/characters"
 
-    timestamp = :os.system_time(:second) |> Integer.to_string()
-    hash = build_hash(timestamp)
-
-    query_string =
-      [
-        ts: timestamp,
-        apikey: public_key(),
-        hash: hash
-      ]
-      |> URI.encode_query()
+    query_string = build_query_string()
 
     case http_client().get("#{url}?#{query_string}") do
       {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
@@ -78,16 +69,7 @@ defmodule TenExTakeHomeWeb.Clients.MarvelClient do
 
     url = "#{base_url()}/characters/#{id}"
 
-    timestamp = :os.system_time(:second) |> Integer.to_string()
-    hash = build_hash(timestamp)
-
-    query_string =
-      [
-        ts: timestamp,
-        apikey: public_key(),
-        hash: hash
-      ]
-      |> URI.encode_query()
+    query_string = build_query_string()
 
     case http_client().get("#{url}?#{query_string}") do
       {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
@@ -127,16 +109,7 @@ defmodule TenExTakeHomeWeb.Clients.MarvelClient do
 
     url = "#{base_url()}/characters/#{id}/comics"
 
-    timestamp = :os.system_time(:second) |> Integer.to_string()
-    hash = build_hash(timestamp)
-
-    query_string =
-      [
-        ts: timestamp,
-        apikey: public_key(),
-        hash: hash
-      ]
-      |> URI.encode_query()
+    query_string = build_query_string()
 
     case http_client().get("#{url}?#{query_string}") do
       {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
@@ -205,6 +178,18 @@ defmodule TenExTakeHomeWeb.Clients.MarvelClient do
 
         {:error, error}
     end
+  end
+
+  defp build_query_string do
+    timestamp = :os.system_time(:second) |> Integer.to_string()
+    hash = build_hash(timestamp)
+
+    [
+      ts: timestamp,
+      apikey: public_key(),
+      hash: hash
+    ]
+    |> URI.encode_query()
   end
 
   defp build_hash(timestamp) do
