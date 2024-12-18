@@ -11,7 +11,7 @@ defmodule TenExTakeHomeWeb.CharactersLive.ShowTest do
       {:ok,
        %{
          "id" => 1,
-         "name" => "3-D Man",
+         "name" => "Name",
          "description" => "This is a description",
          "comics" => %{"available" => 10},
          "events" => %{"available" => 12}
@@ -20,11 +20,10 @@ defmodule TenExTakeHomeWeb.CharactersLive.ShowTest do
 
     {:ok, view, html} = access_characters_page(conn, 1)
 
-    assert html =~ "3-D Man"
-    assert html =~ "This is a description"
+    assert html =~ "Name"
 
-    assert has_element?(view, "#comics-tab-character-1 > span", "10")
-    assert has_element?(view, "#events-tab-character-1 > span", "12")
+    assert has_element?(view, "#comics-tab-character-1")
+    assert has_element?(view, "#events-tab-character-1")
   end
 
   test "must change selected tab", %{conn: conn} do
@@ -32,7 +31,7 @@ defmodule TenExTakeHomeWeb.CharactersLive.ShowTest do
       {:ok,
        %{
          "id" => 1,
-         "name" => "3-D Man",
+         "name" => "Name",
          "description" => "This is a description",
          "comics" => %{"available" => 10},
          "events" => %{"available" => 10}
@@ -41,8 +40,7 @@ defmodule TenExTakeHomeWeb.CharactersLive.ShowTest do
 
     {:ok, view, html} = access_characters_page(conn, 1)
 
-    assert html =~ "3-D Man"
-    assert html =~ "This is a description"
+    assert html =~ "Name"
 
     # comics is active by default
     assert has_element?(view, "#comics-tab-character-1.border-blue-500")

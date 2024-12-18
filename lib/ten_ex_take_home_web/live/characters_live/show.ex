@@ -46,6 +46,8 @@ defmodule TenExTakeHomeWeb.CharactersLive.Show do
 
   def truncate("", _length), do: ""
 
+  def truncate(nil, _length), do: ""
+
   def truncate(string, length) do
     string
     |> String.slice(0, length)
