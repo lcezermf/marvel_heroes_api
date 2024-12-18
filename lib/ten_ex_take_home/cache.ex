@@ -41,6 +41,41 @@ defmodule TenExTakeHome.Cache do
     end
   end
 
+  defp get_characters_from_cache(table) do
+    current_time = System.system_time(:millisecond)
+
+    case :ets.lookup(table, :characters) do
+      [{:characters, characters, expiry}] ->
+        if current_time < expiry do
+          {:ok, characters}
+        else
+          :ets.delete(@table, :characters)
+          {:not_found, []}
+        end
+
+      _ ->
+        {:not_found, []}
+    end
+  end
+
+  defp get_characters_from_api(table) do
+    case marvel_client().get_characters() do
+      {:ok, characters} ->
+        expiry = System.system_time(:millisecond) + @expiry_in
+
+        Logger.info("Inserting updated data from API into cache layer")
+
+        :ets.insert(table, {:characters, characters, expiry})
+
+        {:ok, characters}
+
+      {:error, error} ->
+        Logger.error("Error calling API")
+
+        {:error, error}
+    end
+  end
+
   @doc """
   Get single character from a cache layer.
 
@@ -65,23 +100,6 @@ defmodule TenExTakeHome.Cache do
     end
   end
 
-  defp get_characters_from_cache(table) do
-    current_time = System.system_time(:millisecond)
-
-    case :ets.lookup(table, :characters) do
-      [{:characters, characters, expiry}] ->
-        if current_time < expiry do
-          {:ok, characters}
-        else
-          :ets.delete(@table, :characters)
-          {:not_found, []}
-        end
-
-      _ ->
-        {:not_found, []}
-    end
-  end
-
   defp get_characters_from_cache(table, id) do
     current_time = System.system_time(:millisecond)
 
@@ -96,24 +114,6 @@ defmodule TenExTakeHome.Cache do
 
       _ ->
         {:not_found, nil}
-    end
-  end
-
-  defp get_characters_from_api(table) do
-    case marvel_client().get_characters() do
-      {:ok, characters} ->
-        expiry = System.system_time(:millisecond) + @expiry_in
-
-        Logger.info("Inserting updated data from API into cache layer")
-
-        :ets.insert(table, {:characters, characters, expiry})
-
-        {:ok, characters}
-
-      {:error, error} ->
-        Logger.error("Error calling API")
-
-        {:error, error}
     end
   end
 
