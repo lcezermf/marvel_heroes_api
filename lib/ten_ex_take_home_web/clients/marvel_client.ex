@@ -31,24 +31,9 @@ defmodule TenExTakeHomeWeb.Clients.MarvelClient do
 
     query_string = build_query_string()
 
-    case http_client().get("#{url}?#{query_string}") do
-      {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
-        Logger.info("Success getting data from API")
-
-        Heroes.create_api_request(%{url: url})
-
-        {:ok, decoded_response(body)}
-
-      {:ok, %HTTPoison.Response{status_code: status_code, body: body}} ->
-        Logger.error("Error getting data from API. code: #{status_code}, body: #{inspect(body)}")
-
-        {:error, %{status_code: status_code, body: body}}
-
-      {:error, error} ->
-        Logger.error("Error getting data from API. error: #{inspect(error)}")
-
-        {:error, error}
-    end
+    "#{url}?#{query_string}"
+    |> http_client().get()
+    |> handle_response(url)
   end
 
   @doc """
@@ -77,6 +62,8 @@ defmodule TenExTakeHomeWeb.Clients.MarvelClient do
 
         Heroes.create_api_request(%{url: url})
 
+        # This response has a particular case where I need to get the first item of the list
+        # so I decided to keep this way
         {:ok, List.first(decoded_response(body))}
 
       {:ok, %HTTPoison.Response{status_code: status_code, body: body}} ->
@@ -111,24 +98,9 @@ defmodule TenExTakeHomeWeb.Clients.MarvelClient do
 
     query_string = build_query_string()
 
-    case http_client().get("#{url}?#{query_string}") do
-      {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
-        Logger.info("Success getting data from API")
-
-        Heroes.create_api_request(%{url: url})
-
-        {:ok, decoded_response(body)}
-
-      {:ok, %HTTPoison.Response{status_code: status_code, body: body}} ->
-        Logger.error("Error getting data from API. code: #{status_code}, body: #{inspect(body)}")
-
-        {:error, %{status_code: status_code, body: body}}
-
-      {:error, error} ->
-        Logger.error("Error getting data from API. error: #{inspect(error)}")
-
-        {:error, error}
-    end
+    "#{url}?#{query_string}"
+    |> http_client().get()
+    |> handle_response(url)
   end
 
   @doc """
@@ -149,35 +121,11 @@ defmodule TenExTakeHomeWeb.Clients.MarvelClient do
 
     url = "#{base_url()}/characters/#{id}/events"
 
-    timestamp = :os.system_time(:second) |> Integer.to_string()
-    hash = build_hash(timestamp)
+    query_string = build_query_string()
 
-    query_string =
-      [
-        ts: timestamp,
-        apikey: public_key(),
-        hash: hash
-      ]
-      |> URI.encode_query()
-
-    case http_client().get("#{url}?#{query_string}") do
-      {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
-        Logger.info("Success getting data from API")
-
-        Heroes.create_api_request(%{url: url})
-
-        {:ok, decoded_response(body)}
-
-      {:ok, %HTTPoison.Response{status_code: status_code, body: body}} ->
-        Logger.error("Error getting data from API. code: #{status_code}, body: #{inspect(body)}")
-
-        {:error, %{status_code: status_code, body: body}}
-
-      {:error, error} ->
-        Logger.error("Error getting data from API. error: #{inspect(error)}")
-
-        {:error, error}
-    end
+    "#{url}?#{query_string}"
+    |> http_client().get()
+    |> handle_response(url)
   end
 
   defp build_query_string do
@@ -202,6 +150,26 @@ defmodule TenExTakeHomeWeb.Clients.MarvelClient do
     |> Jason.decode!()
     |> Map.get("data")
     |> Map.get("results")
+  end
+
+  defp handle_response({:ok, %HTTPoison.Response{status_code: 200, body: body}}, url) do
+    Logger.info("Success getting data from API")
+
+    Heroes.create_api_request(%{url: url})
+
+    {:ok, decoded_response(body)}
+  end
+
+  defp handle_response({:ok, %HTTPoison.Response{status_code: status_code, body: body}}, _url) do
+    Logger.error("Error getting data from API. code: #{status_code}, body: #{inspect(body)}")
+
+    {:error, %{status_code: status_code, body: body}}
+  end
+
+  defp handle_response({:error, error}, _url) do
+    Logger.error("Error getting data from API. error: #{inspect(error)}")
+
+    {:error, error}
   end
 
   defp http_client, do: Application.get_env(:ten_ex_take_home, :http_client)
