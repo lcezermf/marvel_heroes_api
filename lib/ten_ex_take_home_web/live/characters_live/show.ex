@@ -33,10 +33,16 @@ defmodule TenExTakeHomeWeb.CharactersLive.Show do
       |> String.to_integer()
       |> Heroes.get_comics()
 
+    events =
+      id
+      |> String.to_integer()
+      |> Heroes.get_events()
+
     socket =
       socket
       |> assign(:character, character)
       |> assign(:comics, comics)
+      |> assign(:events, events)
 
     {:noreply, socket}
   end

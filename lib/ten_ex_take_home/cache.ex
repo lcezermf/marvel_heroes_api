@@ -183,11 +183,70 @@ defmodule TenExTakeHome.Cache do
       {:ok, comics} ->
         expiry = System.system_time(:millisecond) + @expiry_in
 
-        Logger.info("Inserting updated data from API into cache layer for a comics for id #{id}")
+        Logger.info("Inserting updated data from API into cache layer for comics for id #{id}")
 
         :ets.insert(table, {{id, :comics}, comics, expiry})
 
         {:ok, comics}
+
+      {:error, error} ->
+        Logger.error("Error calling API")
+
+        {:error, error}
+    end
+  end
+
+  @doc """
+  Get events from character from a cache layer.
+
+  Instead of calling API every time to get that, the API call is hidden into this module so
+  if the cache exists and not expired it returns data, otherwise will retrieve data from API.
+
+  Returns:
+  - {:ok, data} - in case data is found in cache layer or it was a new retrive from API
+  - :not_found - when no data is found
+  """
+  def get_events(table \\ @table, id) do
+    case get_events_from_cache(table, id) do
+      {:ok, comics} ->
+        Logger.info("Getting events for character #{id} data from cache layer")
+
+        {:ok, comics}
+
+      {:not_found, _} ->
+        Logger.warn("No cache found from cache layer, getting data from API")
+
+        get_events_from_api(table, id)
+    end
+  end
+
+  defp get_events_from_cache(table, id) do
+    current_time = System.system_time(:millisecond)
+
+    case :ets.lookup(table, {id, :events}) do
+      [{{id, :events}, events, expiry}] ->
+        if current_time < expiry do
+          {:ok, events}
+        else
+          :ets.delete(@table, {id, :events})
+          {:not_found, nil}
+        end
+
+      _ ->
+        {:not_found, nil}
+    end
+  end
+
+  defp get_events_from_api(table, id) do
+    case marvel_client().get_events(id) do
+      {:ok, events} ->
+        expiry = System.system_time(:millisecond) + @expiry_in
+
+        Logger.info("Inserting updated data from API into cache layer for events for id #{id}")
+
+        :ets.insert(table, {{id, :events}, events, expiry})
+
+        {:ok, events}
 
       {:error, error} ->
         Logger.error("Error calling API")

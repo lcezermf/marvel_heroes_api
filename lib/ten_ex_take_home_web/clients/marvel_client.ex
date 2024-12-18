@@ -158,6 +158,55 @@ defmodule TenExTakeHomeWeb.Clients.MarvelClient do
     end
   end
 
+  @doc """
+  Fetches a list of Marvel events for a given hero from the Marvel API.
+
+  This function performs an HTTP GET request to the Marvel API `/characters` endpoint using the configured HTTP client.
+  It includes the required query parameters for authentication: `ts` (timestamp), `apikey` (public API key), and `hash` (MD5 hash of the timestamp, private key, and public key).
+
+  Returns:
+    - `{:ok, response}`: When the request is successful, where `response` is the decoded response body.
+    - `{:error, %{status_code: status_code, body: body}}`: When the request fails with a non-200 status code, where `status_code` and `body` describe the error.
+    - `{:error, error}`: When an HTTP error occurs, where `error` contains the error details.
+  """
+  @impl true
+  @spec get_events(integer()) :: {:error, any()} | {:ok, any()}
+  def get_events(id) do
+    Logger.info("Calling get_events/1 from MarvelClient with id: #{id}")
+
+    url = "#{base_url()}/characters/#{id}/events"
+
+    timestamp = :os.system_time(:second) |> Integer.to_string()
+    hash = build_hash(timestamp)
+
+    query_string =
+      [
+        ts: timestamp,
+        apikey: public_key(),
+        hash: hash
+      ]
+      |> URI.encode_query()
+
+    case http_client().get("#{url}?#{query_string}") do
+      {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
+        Logger.info("Success getting data from API")
+
+        Heroes.create_api_request(%{url: url})
+
+        {:ok, decoded_response(body)}
+
+      {:ok, %HTTPoison.Response{status_code: status_code, body: body}} ->
+        Logger.error("Error getting data from API. code: #{status_code}, body: #{inspect(body)}")
+
+        {:error, %{status_code: status_code, body: body}}
+
+      {:error, error} ->
+        Logger.error("Error getting data from API. error: #{inspect(error)}")
+
+        {:error, error}
+    end
+  end
+
   defp build_hash(timestamp) do
     :crypto.hash(:md5, "#{timestamp}#{private_key()}#{public_key()}")
     |> Base.encode16(case: :lower)

@@ -33,7 +33,7 @@
         >
           Comics
           <span class="rounded-sm bg-blue-400 text-white p-1">
-            <%= @character["comics"]["available"] %>
+            <%= length(@comics) %>
           </span>
         </button>
         <button
@@ -44,39 +44,45 @@
         >
           Events
           <span class="rounded-sm bg-blue-400 text-white p-1">
-            <%= @character["events"]["available"] %>
+            <%= length(@events) %>
           </span>
         </button>
       </div>
 
       <div class="tab-content mt-4">
         <%= if @active_tab == "events" do %>
-          <div class="h-96 overflow-y-scroll border border-gray-300 rounded p-4">
-            <div class="grid gap-4">
-              <%= for event <- @events do %>
-                <div class="flex items-center gap-4">
-                  <img
-                    src={"#{event["thumbnail"]["path"]}/standard_fantastic.#{event["thumbnail"]["extension"]}"}
-                    alt={event["title"]}
-                    class="object-cover w-24 h-32 rounded"
-                  />
-                  <p class="text-sm text-gray-800 font-semibold"><%= event["title"] %></p>
-                </div>
-              <% end %>
+          <%= if Enum.any?(@events) do %>
+            <div class="h-96 overflow-y-scroll border border-gray-300 rounded p-4">
+              <div class="grid gap-4">
+                <%= for event <- @events do %>
+                  <div class="flex items-center gap-4">
+                    <img
+                      src={"#{event["thumbnail"]["path"]}/standard_fantastic.#{event["thumbnail"]["extension"]}"}
+                      alt={event["title"]}
+                      class="object-cover w-24 h-32 rounded"
+                    />
+                    <p class="text-sm text-gray-800 font-semibold"><%= event["title"] %></p>
+                  </div>
+                <% end %>
+              </div>
             </div>
-          </div>
+          <% else %>
+            No events
+          <% end %>
         <% else %>
           <div class="h-96 overflow-y-scroll border border-gray-300 rounded p-4">
             <div class="grid gap-4">
-              <%= for comic <- @comics do %>
-                <div class="flex items-center gap-4">
-                  <img
-                    src={"#{comic["thumbnail"]["path"]}/standard_fantastic.#{comic["thumbnail"]["extension"]}"}
-                    alt={comic["title"]}
-                    class="object-cover w-24 h-32 rounded"
-                  />
-                  <p class="text-sm text-gray-800 font-semibold"><%= comic["title"] %></p>
-                </div>
+              <%= if Enum.any?(@comics) do %>
+                <%= for comic <- @comics do %>
+                  <div class="flex items-center gap-4">
+                    <img
+                      src={"#{comic["thumbnail"]["path"]}/standard_fantastic.#{comic["thumbnail"]["extension"]}"}
+                      alt={comic["title"]}
+                      class="object-cover w-24 h-32 rounded"
+                    />
+                    <p class="text-sm text-gray-800 font-semibold"><%= comic["title"] %></p>
+                  </div>
+                <% end %>
               <% end %>
             </div>
           </div>

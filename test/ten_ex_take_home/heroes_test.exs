@@ -96,6 +96,35 @@ defmodule TenExTakeHome.HeroesTest do
     end
   end
 
+  describe "get_events/1" do
+    test "must return a list of data" do
+      expiry = System.system_time(:millisecond) + :timer.minutes(1)
+
+      :ets.insert(
+        :marvel_heroes,
+        {{1, :events}, [%{"title" => "Title"}], expiry}
+      )
+
+      [result | _] = results = Heroes.get_events(1)
+
+      refute Enum.empty?(results)
+      assert result["title"] == "Title"
+    end
+
+    test "must return empty list when no data to fetch" do
+      :ets.delete(:marvel_heroes, {1, :events})
+
+      # when cache does not exists it tries to get data from API
+      expect(marvel_client(), :get_events, fn _ ->
+        {:error, "error"}
+      end)
+
+      results = Heroes.get_events(1)
+
+      assert Enum.empty?(results)
+    end
+  end
+
   describe "create_api_request/1" do
     test "must create a new record of api request" do
       {:ok, %TenExTakeHome.Heroes.APIRequest{} = api_request} =

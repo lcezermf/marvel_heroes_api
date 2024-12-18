@@ -59,6 +59,23 @@ defmodule TenExTakeHome.Heroes do
   end
 
   @doc """
+  Returns data for a character events.
+
+  It fetches the data from cache or API and return for the caller.
+
+    Returns:
+    - list with data: When API returns data
+    - empty list when no data from API
+  """
+  @spec get_events(integer()) :: list()
+  def get_events(id) do
+    case Cache.get_events(id) do
+      {:error, _error} -> []
+      {:ok, events} -> events
+    end
+  end
+
+  @doc """
   Creates a new record for APIRequest
   """
   @spec create_api_request(map()) :: {:ok, Ecto.Changeset.t()} | {:error, Ecto.Changeset.t()}

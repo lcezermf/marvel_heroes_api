@@ -131,6 +131,46 @@ defmodule TenExTakeHomeWeb.Clients.MarvelClientTest do
     end
   end
 
+  describe "get_events/1" do
+    test "must return {:ok, results} where results is a list of data" do
+      assert Repo.aggregate(APIRequest, :count) == 0
+
+      response_body = Jason.encode!(fake_raw_response_with_events())
+
+      expect(http_client(), :get, fn _ ->
+        {:ok, %HTTPoison.Response{body: response_body, status_code: 200}}
+      end)
+
+      {:ok, [result | _]} = MarvelClient.get_events(1_009_144)
+
+      assert Repo.aggregate(APIRequest, :count) == 1
+      assert Repo.one(APIRequest, limit: 1).url =~ "/characters/#{1_009_144}/events"
+      assert result["title"] == "Acts of Vengeance!"
+    end
+
+    test "must return {:error, map()} when request is wrong" do
+      assert Repo.aggregate(APIRequest, :count) == 0
+
+      response_body =
+        Jason.encode!(%{
+          code: "MissingParameter",
+          message: "You must provide a timestamp."
+        })
+
+      expect(http_client(), :get, fn _ ->
+        {:error, %HTTPoison.Response{body: response_body, status_code: 409}}
+      end)
+
+      assert Repo.aggregate(APIRequest, :count) == 0
+
+      {:error, response} = MarvelClient.get_characters()
+
+      assert response.status_code == 409
+      assert Jason.decode!(response.body)["code"] == "MissingParameter"
+      assert Jason.decode!(response.body)["message"] == "You must provide a timestamp."
+    end
+  end
+
   defp http_client, do: Application.get_env(:ten_ex_take_home, :http_client)
 
   defp fake_raw_response_with_list_of_characters do
@@ -778,6 +818,52 @@ defmodule TenExTakeHomeWeb.Clients.MarvelClientTest do
               "collectionURI" => "http://gateway.marvel.com/v1/public/comics/112787/events",
               "items" => [],
               "returned" => 0
+            }
+          }
+        ]
+      }
+    }
+  end
+
+  defp fake_raw_response_with_events do
+    %{
+      "code" => 200,
+      "status" => "Ok",
+      "copyright" => "© 2024 MARVEL",
+      "attributionText" => "Data provided by Marvel. © 2024 MARVEL",
+      "attributionHTML" =>
+        "<a href=\"http://marvel.com\">Data provided by Marvel. © 2024 MARVEL</a>",
+      "etag" => "1289ac39864e0fd2ea10cfbc2461c2252d90c131",
+      "data" => %{
+        "offset" => 0,
+        "limit" => 20,
+        "total" => 5,
+        "count" => 5,
+        "results" => [
+          %{
+            "id" => 116,
+            "title" => "Acts of Vengeance!",
+            "description" =>
+              "Loki sets about convincing the super-villains of Earth to attack heroes other than those they normally fight in an attempt to destroy the Avengers to absolve his guilt over inadvertently creating the team in the first place.",
+            "resourceURI" => "http://gateway.marvel.com/v1/public/events/116",
+            "urls" => [
+              %{
+                "type" => "detail",
+                "url" =>
+                  "http://marvel.com/comics/events/116/acts_of_vengeance?utm_campaign=apiRef&utm_source=91f5d1d5b0209ba9bba6086f01263b39"
+              },
+              %{
+                "type" => "wiki",
+                "url" =>
+                  "http://marvel.com/universe/Acts_of_Vengeance!?utm_campaign=apiRef&utm_source=91f5d1d5b0209ba9bba6086f01263b39"
+              }
+            ],
+            "modified" => "2013-06-28T16:31:24-0400",
+            "start" => "1989-12-10 00:00:00",
+            "end" => "2008-01-04 00:00:00",
+            "thumbnail" => %{
+              "path" => "http://i.annihil.us/u/prod/marvel/i/mg/9/40/51ca10d996b8b",
+              "extension" => "jpg"
             }
           }
         ]
