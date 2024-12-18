@@ -6,7 +6,7 @@ defmodule TenExTakeHome.Cache do
   require Logger
 
   @table :marvel_heroes
-  @expiry_in :timer.minutes(10)
+  @expiry_in :timer.hours(1)
 
   def start_link(table_name \\ @table) do
     if :ets.info(table_name) == :undefined do
